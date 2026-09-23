@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate, Navigate } from "react-router";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import useAuthStore from "@/pages/Auth/store/useAuthStore";
 
@@ -11,9 +11,8 @@ function AuthLayout() {
   const { type } = useParams();
   const navigate = useNavigate();
 
-  // Ambil state, action, dan user aktif dari Zustand store
-  const { login, error, user } = useAuthStore();
-
+  // Ambil register, login, error, dan user dari Zustand store
+  const { register, login, error, user } = useAuthStore();
 
   if (user) {
     if (user.role === "admin") {
@@ -30,10 +29,20 @@ function AuthLayout() {
     const formData = new FormData(e.currentTarget);
     const emailInput = formData.get("email");
     const passwordInput = formData.get("password");
+    const nameInput = formData.get("name");
 
     if (isSignUp) {
-      console.log("Fitur Sign Up belum tersimpan permanen di mock data");
-      navigate("/auth/sign-in");
+      // Jalankan fungsi pendaftaran
+      const success = register({
+        name: nameInput,
+        email: emailInput,
+        password: passwordInput,
+        role: "user", // Default akun pendaftaran baru sebagai 'user'
+      });
+
+      if (success) {
+        navigate("/auth/sign-in");
+      }
     } else {
       const success = login(emailInput, passwordInput);
 
@@ -41,10 +50,8 @@ function AuthLayout() {
         const currentUser = useAuthStore.getState().user;
 
         if (currentUser?.role === "admin") {
-          console.log("Masuk sebagai Admin");
           navigate("/admin");
         } else if (currentUser?.role === "user") {
-          console.log("Masuk sebagai User Biasa");
           navigate("/user");
         }
       }

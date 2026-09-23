@@ -1,35 +1,52 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-const MOCK_USERS = [
-  {
-    id: 1,
-    email: "admin@gmail.com",
-    password: "123",
-    name: "Budi",
-    role: "admin",
-  },
-  {
-    id: 2,
-    email: "user@gmail.com",
-    password: "123",
-    name: "Siti",
-    role: "user",
-  },
-];
+import { MOCK_USERS } from "@/data/userData";
 
 const useAuthStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
+      users: MOCK_USERS, // Data default dari userData.js
       error: null,
 
       setUser: (user) => set({ user }),
 
+      // Fungsi Registrasi
+      register: ({ name, email, password, role = "user" }) => {
+        // Pengaman: Jika users dari storage kosong/undefined, gunakan MOCK_USERS
+        const currentUsers = get().users || MOCK_USERS;
+
+        const isExist = currentUsers.some((u) => u.email === email);
+        if (isExist) {
+          set({ error: "Email sudah terdaftar!" });
+          return false;
+        }
+
+        const newUser = {
+          id: Date.now(),
+          name,
+          email,
+          password,
+          role,
+        };
+
+        set({
+          users: [...currentUsers, newUser],
+          error: null,
+        });
+
+        return true;
+      },
+
+      // Fungsi Login
       login: (email, password) => {
-        const foundUser = MOCK_USERS.find(
-          (user) => user.email === email && user.password === password,
+        // Pengaman: Jika users dari storage kosong/undefined, gunakan MOCK_USERS
+        const currentUsers = get().users || MOCK_USERS;
+
+        const foundUser = currentUsers.find(
+          (u) => u.email === email && u.password === password
         );
+
         if (foundUser) {
           set({
             user: {
@@ -40,17 +57,23 @@ const useAuthStore = create(
             },
             error: null,
           });
-          return true; // Berhasil login
+          return true;
         } else {
           set({ user: null, error: "Email atau password salah" });
-          return false; // Gagal login
+          return false;
         }
       },
 
       logout: () => set({ user: null, error: null }),
     }),
     {
-      name: "auth-storage", // Key untuk menyimpan state di localStorage
+      name: "auth-storage",
+      // Penggabung otomatis state baru jika struktur storage berbeda
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...persistedState,
+        users: persistedState?.users?.length ? persistedState.users : currentState.users,
+      }),
     }
   )
 );
