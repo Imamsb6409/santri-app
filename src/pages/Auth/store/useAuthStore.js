@@ -44,7 +44,7 @@ const useAuthStore = create(
         const currentUsers = get().users || MOCK_USERS;
 
         const foundUser = currentUsers.find(
-          (u) => u.email === email && u.password === password
+          (u) => u.email === email && u.password === password,
         );
 
         if (foundUser) {
@@ -72,10 +72,12 @@ const useAuthStore = create(
       merge: (persistedState, currentState) => ({
         ...currentState,
         ...persistedState,
-        users: persistedState?.users?.length ? persistedState.users : currentState.users,
+        users: persistedState?.users?.length
+          ? persistedState.users
+          : currentState.users,
       }),
-    }
-  )
+    },
+  ),
 );
 
 export default useAuthStore;

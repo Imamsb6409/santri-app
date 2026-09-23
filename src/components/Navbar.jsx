@@ -67,16 +67,21 @@ function Navbar({ role = "guest", customUser, onLogout }) {
   const { settings } = useSettings();
   const navigate = useNavigate();
 
+  // 1. Ambil data user aktif dan fungsi logout dari Zustand store
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
   // Memilih konfigurasi role (fallback ke 'guest' jika role tidak ditemukan)
   const currentRole = ROLE_CONFIG[role] || ROLE_CONFIG.guest;
 
   // Profil pengguna
   const userDisplay = {
-    name: customUser?.name || currentRole.name,
-    avatar: customUser?.avatar || currentRole.avatar,
+    name: user?.name || customUser?.name || currentRole.name,
+    avatar: user?.name
+      ? user.name.charAt(0).toUpperCase()
+      : customUser?.avatar || currentRole.avatar,
     title: customUser?.title || currentRole.title,
   };
-
   // State Management
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,9 +173,6 @@ function Navbar({ role = "guest", customUser, onLogout }) {
     setNotifOpen(false);
     setSearchQuery("");
   };
-
-  const logout = useAuthStore((state) => state.logout);
-
 
   const handleLogoutClick = () => {
     logout(); // 1. Hapus data user dari Zustand & localStorage
