@@ -68,7 +68,7 @@ function AuthLayout() {
           {/* Header & Logo */}
           <div className="mb-6 text-center">
             <img
-              src="/favicon.svg"
+              src="/favicon.jpg"
               alt="Sign Logo"
               className="mx-auto mb-3 h-10 w-auto"
             />
