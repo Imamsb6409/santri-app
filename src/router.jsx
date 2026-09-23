@@ -15,6 +15,10 @@ import HomeGuest from "./pages/HomeGuest";
 import PengaturanGuest from "./pages/PengaturanGuest";
 
 const router = createBrowserRouter([
+  {
+    index: true,
+    element: <AuthLayout />,
+  },
   // Guest Routes
   {
     path: "/",

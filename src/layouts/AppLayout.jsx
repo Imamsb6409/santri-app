@@ -1,19 +1,11 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router";
 import Navbar from "@/components/Navbar";
-import AppSidebarAdmin from "@/components/Sidebar";
-import AppSidebarGuest from "@/components/SidebarGuest";
-import AppSidebarUser from "@/components/SidebarUser";
+import AppSidebar from "@/components/Sidebar"; // Sesuaikan path file AppSidebar kamu
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SettingsProvider } from "@/context/SettingsContext";
 import useAuthStore from "@/pages/Auth/store/useAuthStore";
-
-const SIDEBAR_MAP = {
-  admin: AppSidebarAdmin,
-  user: AppSidebarUser,
-  guest: AppSidebarGuest,
-};
 
 function AppLayout({ role = "guest", customUser }) {
   const user = useAuthStore((state) => state.user);
@@ -30,14 +22,13 @@ function AppLayout({ role = "guest", customUser }) {
     if (user.role !== "user") return <Navigate to="/admin" replace />;
   }
 
-  const SidebarComponent = SIDEBAR_MAP[role] || AppSidebarGuest;
   const mainClass = role === "guest" ? "flex-1" : "flex-1 p-6";
 
   return (
     <SettingsProvider>
       <TooltipProvider>
         <SidebarProvider>
-          <SidebarComponent />
+          <AppSidebar role={role} />
 
           <SidebarInset>
             <Navbar role={role} customUser={customUser} />

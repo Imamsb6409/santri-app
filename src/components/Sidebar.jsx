@@ -18,21 +18,61 @@ import {
   Users,
   Settings,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 import { santriList } from "@/data/santriData";
 
-const mainNav = [
-  { to: "/admin", label: "Beranda", icon: Home, end: true },
-  { to: "/admin/santri", label: "Data Santri", icon: Users, badge: santriList.length },
-];
+const sidebarConfigs = {
+  admin: {
+    mainNav: [
+      { to: "/admin", label: "Beranda", icon: Home, end: true },
+      { to: "/admin/santri/list", label: "Data Santri", icon: Users, badge: santriList.length },
+    ],
+    secondaryNav: [
+      { to: "/admin/about", label: "Tentang Aplikasi", icon: Info },
+      { to: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
+    ],
+    user: {
+      name: "Admin Ust. Ali",
+      description: "admin@santri.id",
+      initials: "AD",
+    },
+  },
+  guest: {
+    mainNav: [
+      { to: "/", label: "Beranda", icon: Home, end: true },
+      { to: "/santri-guest", label: "Data Santri", icon: Users, badge: santriList.length },
+    ],
+    secondaryNav: [
+      { to: "/about", label: "Tentang Aplikasi", icon: Info },
+      { to: "/pengaturan-guest", label: "Pengaturan", icon: Settings },
+    ],
+    user: {
+      name: "Guest User",
+      description: "Masuk sebagai tamu",
+      initials: "GU",
+    },
+  },
+  user: {
+    mainNav: [
+      { to: "/user", label: "Beranda", icon: Home, end: true },
+      { to: "/user/santri/list", label: "Data Santri", icon: Users, badge: santriList.length },
+    ],
+    secondaryNav: [
+      { to: "/user/about", label: "Tentang Aplikasi", icon: Info },
+      { to: "/user/pengaturan-guest", label: "Pengaturan", icon: Settings },
+    ],
+    user: {
+      name: "User",
+      description: "Masuk sebagai user",
+      initials: "US",
+    },
+  },
+};
 
-const secondaryNav = [
-  { to: "/admin/about", label: "Tentang Aplikasi", icon: Info },
-  { to: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
-];
+function AppSidebar({ role = "admin" }) {
+  const currentConfig = sidebarConfigs[role] || sidebarConfigs.admin;
+  const { mainNav, secondaryNav, user } = currentConfig;
 
-function AppSidebar() {
   return (
     <Sidebar className="border-r border-slate-200 bg-white">
       {/* App Header */}
@@ -44,14 +84,14 @@ function AppSidebar() {
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-base font-bold text-slate-800 tracking-tight truncate">
-                Santri<span className="text-emerald-600">App</span>
+                Isaba<span className="text-emerald-600">ntri</span>
               </span>
               <span className="inline-flex items-center px-1.5 py-0.2 text-[9px] font-extrabold bg-emerald-100 text-emerald-800 rounded-full">
                 PRO
               </span>
             </div>
             <span className="text-xs text-slate-400 font-medium truncate">
-              Sistem Sistem Pesantren
+              Sistem Pesantren
             </span>
           </div>
         </div>
@@ -146,14 +186,14 @@ function AppSidebar() {
         <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
-              AD
+              {user.initials}
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-semibold text-slate-800 truncate">
-                Admin Ust. Ali
+                {user.name}
               </span>
               <span className="text-[10px] text-slate-400 truncate">
-                admin@santri.id
+                {user.description}
               </span>
             </div>
           </div>

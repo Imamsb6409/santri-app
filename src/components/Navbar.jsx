@@ -27,7 +27,7 @@ const ROLE_CONFIG = {
     settingsPath: "/pengaturan-guest",
     aboutPath: "/about",
     shortcuts: [
-      { label: "Daftar Santri", path: "/santri" },
+      { label: "Daftar Santri", path: "santri/list" },
       { label: "Rekap Nilai", path: "/santri/nilai" },
       { label: "Presensi Santri", path: "/santri/absensi" },
       { label: "Pengaturan", path: "/pengaturan" },
@@ -41,7 +41,7 @@ const ROLE_CONFIG = {
     settingsPath: "pengaturan-guest",
     aboutPath: "about",
     shortcuts: [
-      { label: "Daftar Santri", path: "santri" },
+      { label: "Daftar Santri", path: "santri/list" },
       { label: "Rekap Nilai", path: "santri/nilai" },
       { label: "Presensi Santri", path: "santri/absensi" },
       { label: "Pengaturan", path: "pengaturan-guest" },
@@ -55,7 +55,7 @@ const ROLE_CONFIG = {
     settingsPath: "pengaturan",
     aboutPath: "about",
     shortcuts: [
-      { label: "Daftar Santri", path: "santri" },
+      { label: "Daftar Santri", path: "santri/list" },
       { label: "Rekap Nilai", path: "santri/nilai" },
       { label: "Presensi Santri", path: "santri/absensi" },
       { label: "Pengaturan", path: "pengaturan" },
@@ -190,10 +190,10 @@ function Navbar({ role = "guest", customUser, onLogout }) {
             className="flex items-center gap-2 group cursor-pointer"
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 font-bold text-white text-xs shadow-xs group-hover:bg-emerald-700 transition-colors">
-              S
+              ISB
             </div>
             <span className="text-sm font-bold tracking-tight text-slate-800">
-              Santri<span className="text-emerald-600">App</span>
+              Isaba<span className="text-emerald-600">ntri</span>
             </span>
           </Link>
         </div>

@@ -70,7 +70,7 @@ function Home() {
           </div>
 
           <Link
-            to="santri"
+            to="santri/list"
             className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-emerald-800 hover:bg-emerald-50 font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shrink-0 active:scale-95"
           >
             <Plus size={16} />
@@ -206,7 +206,7 @@ function Home() {
                 </p>
               </div>
               <Link
-                to="santri"
+                to="santri/list"
                 className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1"
               >
                 <span>Lihat Semua</span>

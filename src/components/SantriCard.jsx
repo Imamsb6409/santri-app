@@ -6,7 +6,7 @@ function SantriCard({ id, name, classroom }) {
 
   return (
     <Link
-      to={`list/${id}`}
+      to={`${id}`}
       className="group relative flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-400 hover:-translate-y-0.5 transition-all duration-200"
     >
       {/* Avatar Inisial */}
