@@ -15,13 +15,18 @@ import HomeGuest from "./pages/HomeGuest";
 import PengaturanGuest from "./pages/PengaturanGuest";
 
 const router = createBrowserRouter([
-  // Guest Routes
+  // Guest / Root Routes
   {
     path: "/",
     element: <AppLayout role="guest" />,
     children: [
       {
         index: true,
+        // Langsung arahkan pengguna ke halaman Sign In saat pertama kali membuka aplikasi
+        element: <Navigate to="/auth/sign-in" replace />,
+      },
+      {
+        path: "home-guest",
         element: <HomeGuest />,
       },
       {

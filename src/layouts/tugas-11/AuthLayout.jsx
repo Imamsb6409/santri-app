@@ -1,19 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, Link, useNavigate, Navigate } from "react-router";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import useAuthStore from "@/pages/Auth/store/useAuthStore";
+import { signUpSchema, signInSchema } from "../../schemas/RegisterSchema";
 
 function AuthLayout() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const { type } = useParams();
   const navigate = useNavigate();
 
-  // Ambil register, login, error, dan user dari Zustand store
-  const { register, login, error, user } = useAuthStore();
+  const {
+    register: registerAuth,
+    login,
+    error,
+    user,
+    clearError,
+  } = useAuthStore();
 
+  const isSignUp = type === "sign-up";
+
+  // Pilih schema berdasarkan mode (Sign Up atau Sign In)
+  const currentSchema = isSignUp ? signUpSchema : signInSchema;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: "onChange",
+    resolver: zodResolver(currentSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  // Reset form & hapus pesan error saat berpindah mode
+  useEffect(() => {
+    reset({
+      name: "",
+      email: "",
+      password: "",
+    });
+    if (clearError) clearError();
+  }, [type, reset, clearError]);
+
+  // Redirection jika user sudah login
   if (user) {
     if (user.role === "admin") {
       return <Navigate to="/admin" replace />;
@@ -21,30 +55,20 @@ function AuthLayout() {
     return <Navigate to="/user" replace />;
   }
 
-  const isSignUp = type === "sign-up";
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-    const emailInput = formData.get("email");
-    const passwordInput = formData.get("password");
-    const nameInput = formData.get("name");
-
+  const onSubmit = (data) => {
     if (isSignUp) {
-      // Jalankan fungsi pendaftaran
-      const success = register({
-        name: nameInput,
-        email: emailInput,
-        password: passwordInput,
-        role: "user", // Default akun pendaftaran baru sebagai 'user'
+      const success = registerAuth({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: "user",
       });
 
       if (success) {
         navigate("/auth/sign-in");
       }
     } else {
-      const success = login(emailInput, passwordInput);
+      const success = login(data.email, data.password);
 
       if (success) {
         const currentUser = useAuthStore.getState().user;
@@ -60,19 +84,19 @@ function AuthLayout() {
 
   return (
     <section className="flex min-h-screen items-center justify-between bg-gray-50 dark:bg-zinc-900">
-      {/* Sisi Kiri - Hero / Visual */}
-      <div className="w-1/2 h-screen hidden md:block">
+      {/* Visual */}
+      <div className="hidden h-screen w-1/2 md:block">
         <img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvKgw-XLS0CK4GQN7YnFOEwy2f7RN-Hn3_cNmKPs9prQ&s=10"
           alt="Auth Visual"
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
       </div>
 
-      {/* Sisi Kanan - Form Container */}
-      <div className="w-1/2 h-screen flex flex-col justify-center p-8 bg-white dark:bg-zinc-950 border-l border-gray-200 dark:border-zinc-800">
+      {/* Form Container */}
+      <div className="flex h-screen w-1/2 flex-col justify-center border-l border-gray-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto w-full max-w-md">
-          {/* Header & Logo */}
+          {/* Header */}
           <div className="mb-6 text-center">
             <img
               src="/favicon.jpg"
@@ -89,64 +113,103 @@ function AuthLayout() {
             </p>
           </div>
 
-          {/* Menampilkan Pesan Error dari Zustand jika ada */}
+          {/* Alert Error Zustand */}
           {error && (
             <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
               {error}
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
+          {/* Form Utama */}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
+            {/* Input Nama (Sign Up Only) */}
             {isSignUp && (
-              <Field>
-                <FieldLabel htmlFor="input-name">Nama Lengkap</FieldLabel>
-                <Input
+              <div>
+                <label
+                  htmlFor="input-name"
+                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Nama Lengkap
+                </label>
+                <input
                   id="input-name"
-                  name="name"
                   type="text"
                   placeholder="John Doe"
-                  required
+                  {...register("name")}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
-              </Field>
+                {errors.name && (
+                  <span className="mt-1 block text-xs text-red-500">
+                    {errors.name.message}
+                  </span>
+                )}
+              </div>
             )}
 
-            <Field>
-              <FieldLabel htmlFor="input-email">Email</FieldLabel>
-              <Input
+            {/* Input Email */}
+            <div>
+              <label
+                htmlFor="input-email"
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Email
+              </label>
+              <input
                 id="input-email"
-                name="email"
                 type="email"
                 placeholder="nama@email.com"
-                required
+                {...register("email")}
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
               />
-            </Field>
+              {errors.email && (
+                <span className="mt-1 block text-xs text-red-500">
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
 
-            <Field>
-              <FieldLabel htmlFor="input-password">Password</FieldLabel>
-              <Input
+            {/* Input Password */}
+            <div>
+              <label
+                htmlFor="input-password"
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Password
+              </label>
+              <input
                 id="input-password"
-                name="password"
                 type="password"
                 placeholder="••••••••"
-                required
+                {...register("password")}
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
               />
-            </Field>
+              {errors.password && (
+                <span className="mt-1 block text-xs text-red-500">
+                  {errors.password.message}
+                </span>
+              )}
+            </div>
 
+            {/* Tombol Submit */}
             <button
               type="submit"
-              className="mt-2 w-full rounded-lg bg-black py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-white dark:text-black dark:hover:bg-gray-200 cursor-pointer"
+              disabled={!isValid}
+              className={`mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition ${
+                isValid
+                  ? "cursor-pointer bg-black text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-zinc-800 dark:text-zinc-600"
+              }`}
             >
               {isSignUp ? "Daftar Akun" : "Masuk"}
             </button>
           </form>
 
-          {/* Navigasi Switcher Antara Sign In & Sign Up */}
+          {/* Switcher Navigasi */}
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
             <Link to="/">
               <button className="mb-3 cursor-pointer">
                 masuk sebagai{" "}
-                <span className="font-bold underline text-black dark:text-white">
+                <span className="font-bold text-black underline dark:text-white">
                   tamu
                 </span>
               </button>

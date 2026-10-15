@@ -10,13 +10,19 @@ const useAuthStore = create(
       error: null,
 
       setUser: (user) => set({ user }),
+      clearError: () => set({ error: null }),
 
       // Fungsi Registrasi
       register: ({ name, email, password, role = "user" }) => {
-        // Pengaman: Jika users dari storage kosong/undefined, gunakan MOCK_USERS
         const currentUsers = get().users || MOCK_USERS;
 
-        const isExist = currentUsers.some((u) => u.email === email);
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanPassword = password.trim();
+
+        const isExist = currentUsers.some(
+          (u) => u.email.trim().toLowerCase() === cleanEmail
+        );
+
         if (isExist) {
           set({ error: "Email sudah terdaftar!" });
           return false;
@@ -24,9 +30,9 @@ const useAuthStore = create(
 
         const newUser = {
           id: Date.now(),
-          name,
-          email,
-          password,
+          name: name.trim(),
+          email: cleanEmail,
+          password: cleanPassword,
           role,
         };
 
@@ -40,11 +46,15 @@ const useAuthStore = create(
 
       // Fungsi Login
       login: (email, password) => {
-        // Pengaman: Jika users dari storage kosong/undefined, gunakan MOCK_USERS
         const currentUsers = get().users || MOCK_USERS;
 
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanPassword = password.trim();
+
         const foundUser = currentUsers.find(
-          (u) => u.email === email && u.password === password,
+          (u) =>
+            u.email.trim().toLowerCase() === cleanEmail &&
+            u.password.trim() === cleanPassword
         );
 
         if (foundUser) {
@@ -68,7 +78,6 @@ const useAuthStore = create(
     }),
     {
       name: "auth-storage",
-      // Penggabung otomatis state baru jika struktur storage berbeda
       merge: (persistedState, currentState) => ({
         ...currentState,
         ...persistedState,
@@ -76,8 +85,8 @@ const useAuthStore = create(
           ? persistedState.users
           : currentState.users,
       }),
-    },
-  ),
+    }
+  )
 );
 
 export default useAuthStore;
